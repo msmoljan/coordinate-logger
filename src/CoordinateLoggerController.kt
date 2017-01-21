@@ -21,7 +21,7 @@ class CoordinateLoggerController : Initializable {
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
 
-        imageView?.setOnDragOver {
+        scrollPane?.setOnDragOver {
             val db = it.dragboard
 
             val isAccepted = db.files[0].name.toLowerCase().endsWith(".png")
@@ -30,10 +30,7 @@ class CoordinateLoggerController : Initializable {
 
             if (db.hasFiles()) {
                 if (isAccepted) {
-                    imageView?.setStyle("-fx-border-color: red;"
-                            + "-fx-border-width: 5;"
-                            + "-fx-background-color: #C6C6C6;"
-                            + "-fx-border-style: solid;");
+                    imageView?.style = "-fx-border-color: red;-fx-border-width: 5;-fx-background-color: #C6C6C6;-fx-border-style: solid;"
                     it.acceptTransferModes(TransferMode.COPY);
                 }
             } else {
@@ -41,14 +38,14 @@ class CoordinateLoggerController : Initializable {
             }
         }
 
-        imageView?.setOnDragDropped {
+        scrollPane?.setOnDragDropped {
             val db = it.dragboard
             val isAccepted = db.files[0].name.toLowerCase().endsWith(".png")
                     || db.files[0].name.toLowerCase().endsWith(".jpeg")
                     || db.files[0].name.toLowerCase().endsWith(".jpg")
 
             if (db.hasFiles() && isAccepted) {
-                //display the image file
+                setImage(db.files[0].toURI().toString())
             } else {
                 it.consume()
             }
