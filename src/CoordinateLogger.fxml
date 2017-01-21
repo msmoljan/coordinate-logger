@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<AnchorPane id="rootPane"
-            prefWidth="640"
-            prefHeight="480"
-            xmlns="http://javafx.com/javafx/8.0.102-ea"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="CoordinateLoggerController">
+
+<AnchorPane id="rootPane" prefHeight="480" prefWidth="640" xmlns="http://javafx.com/javafx/8.0.102-ea"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="CoordinateLoggerController">
+
     <Label alignment="CENTER" layoutX="166.0" layoutY="192.0" text="%drag_drop_image" textAlignment="CENTER"
            wrapText="true" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="100"
            AnchorPane.topAnchor="0">
@@ -17,10 +17,10 @@
             <Font size="16.0"/>
         </font>
     </Label>
-    <TextArea editable="false"
-              maxWidth="100.0"
-              text="%coordinates_header"
-              AnchorPane.bottomAnchor="0"
-              AnchorPane.rightAnchor="0"
-              AnchorPane.topAnchor="0"/>
+    <ScrollPane fx:id="scrollPane" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="100"
+                AnchorPane.topAnchor="0">
+        <ImageView fx:id="imageView" preserveRatio="true"/>
+    </ScrollPane>
+    <TextArea editable="false" maxWidth="100.0" text="%coordinates_header" AnchorPane.bottomAnchor="0"
+              AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0"/>
 </AnchorPane>
