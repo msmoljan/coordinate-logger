@@ -19,6 +19,7 @@ class CoordinateLoggerApplication : Application(), CoordinateLoggerController.Li
     var stage: Stage? = null
 
     companion object {
+
         @JvmStatic
         fun main(args: Array<String>) {
             launch(CoordinateLoggerApplication::class.java)
@@ -47,6 +48,6 @@ class CoordinateLoggerApplication : Application(), CoordinateLoggerController.Li
     }
 
     override fun onImageHoverCoordinatesReceived(x: Int, y: Int) {
-        stage?.title = "$appName (${x}, ${y})"
+        stage?.title = "$appName ($x, $y)"
     }
 }

@@ -14,7 +14,7 @@ import java.util.*
 
 
 class CoordinateLoggerController : Initializable, Listener {
-
+  
     interface Listener {
         fun onImageHoverCoordinatesReceived(x: Int, y: Int)
     }
