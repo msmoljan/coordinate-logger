@@ -1,7 +1,9 @@
+import CoordinateLogger.Listener
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
+import javafx.scene.control.TextArea
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.DragEvent
@@ -11,26 +13,34 @@ import java.net.URL
 import java.util.*
 
 
-class CoordinateLoggerController : Initializable {
+class CoordinateLoggerController : Initializable, Listener {
 
     interface Listener {
-        fun onImageHoverCoordinatesReceived(x: Double, y: Double);
+        fun onImageHoverCoordinatesReceived(x: Int, y: Int)
     }
 
     val supportedExtensions = arrayOf(".png", ".jpeg", ".jpg")
-    val dragHoverStyle = "-fx-border-color: #1565c0;-fx-border-width: 3;-fx-border-style: solid;-fx-background: transparent;"
 
+    val dragHoverStyle = "-fx-border-color: #1565c0;-fx-border-width: 3;-fx-border-style: solid;-fx-background: transparent;"
+    val coordinateLogger = CoordinateLogger()
     var scrollPaneDefaultStyle: String? = null
+
     var imageViewDefaultStyle: String? = null
     var listener: Listener? = null
 
     @FXML var scrollPane: ScrollPane? = null
     @FXML var imageView: ImageView? = null
     @FXML var instructionView: Label? = null
+    @FXML var logView: TextArea? = null
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         setupDragAndDrop()
         setupCoordinateClicks()
+        coordinateLogger.listener = this
+    }
+
+    override fun onCoordinatesUpdated() {
+        logView?.text = coordinateLogger.toString()
     }
 
     private fun setupDragAndDrop() {
@@ -54,6 +64,7 @@ class CoordinateLoggerController : Initializable {
                 setImage(it.dragboard.files[0].toURI().toString())
                 hideDragOverFeedback()
                 instructionView?.isVisible = false
+                coordinateLogger.clear()
             })
         }
 
@@ -63,11 +74,11 @@ class CoordinateLoggerController : Initializable {
 
     private fun setupCoordinateClicks() {
         imageView?.setOnMouseMoved {
-            listener?.onImageHoverCoordinatesReceived(it.x, it.y)
+            listener?.onImageHoverCoordinatesReceived(it.x.toInt(), it.y.toInt())
         }
 
         imageView?.setOnMouseClicked {
-            println("X: ${it.x}\tY: ${it.y}")
+            coordinateLogger.log(Coordinate(it.x.toInt(), it.y.toInt()))
         }
     }
 
@@ -81,7 +92,7 @@ class CoordinateLoggerController : Initializable {
         imageView?.style = imageViewDefaultStyle
     }
 
-    fun handleAcceptedFileOnDrag(event: DragEvent, handleFunction: (DragEvent) -> Unit) {
+    private fun handleAcceptedFileOnDrag(event: DragEvent, handleFunction: (DragEvent) -> Unit) {
         val db = event.dragboard
         val file = db.files[0]
 
@@ -92,7 +103,7 @@ class CoordinateLoggerController : Initializable {
         }
     }
 
-    fun setImage(url: String?) {
+    private fun setImage(url: String?) {
         if (url != null) {
             imageView?.image = Image(url)
             scrollPane?.opacity = 1.0
@@ -102,7 +113,7 @@ class CoordinateLoggerController : Initializable {
         }
     }
 
-    fun isFileAccepted(file: File): Boolean {
+    private fun isFileAccepted(file: File): Boolean {
         supportedExtensions.forEach {
             if (file.name.toLowerCase().endsWith(it)) {
                 return true
