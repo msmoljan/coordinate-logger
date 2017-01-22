@@ -7,7 +7,6 @@ import java.util.*
 
 
 class CoordinateLoggerApplication : Application() {
-
     val initialWidth = 640.0
     val initialHeight = 480.0
     val minStageWidth = 460.0
