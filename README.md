@@ -1,4 +1,4 @@
-# com.matkosmoljan.coordinatelogger.Coordinate Logger
+# Coordinate Logger
 Loads a preview image and logs click coordinates (in pixels)
 
 # License
