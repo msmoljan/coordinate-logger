@@ -21,7 +21,7 @@
                 <option name="metaInfo" value="false" />
                 <option name="kjsm" value="false" />
                 <option name="target" />
-                <option name="moduleKind" />
+                <option name="moduleKind" value="plain" />
                 <option name="main" />
                 <option name="outputPrefix" />
                 <option name="outputPostfix" />
