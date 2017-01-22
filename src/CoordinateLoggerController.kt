@@ -12,17 +12,28 @@ import java.util.*
 
 
 class CoordinateLoggerController : Initializable {
+
+    interface Listener {
+        fun onImageHoverCoordinatesReceived(x: Double, y: Double);
+    }
+
     val supportedExtensions = arrayOf(".png", ".jpeg", ".jpg")
     val dragHoverStyle = "-fx-border-color: #1565c0;-fx-border-width: 3;-fx-border-style: solid;-fx-background: transparent;"
 
     var scrollPaneDefaultStyle: String? = null
     var imageViewDefaultStyle: String? = null
+    var listener: Listener? = null
 
     @FXML var scrollPane: ScrollPane? = null
     @FXML var imageView: ImageView? = null
     @FXML var instructionView: Label? = null
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
+        setupDragAndDrop()
+        setupCoordinateClicks()
+    }
+
+    private fun setupDragAndDrop() {
         scrollPaneDefaultStyle = scrollPane?.style
         imageViewDefaultStyle = imageView?.style
 
@@ -48,6 +59,16 @@ class CoordinateLoggerController : Initializable {
 
         scrollPane?.setOnDragDone { hideDragOverFeedback() }
         scrollPane?.setOnDragExited { hideDragOverFeedback() }
+    }
+
+    private fun setupCoordinateClicks() {
+        imageView?.setOnMouseMoved {
+            listener?.onImageHoverCoordinatesReceived(it.x, it.y)
+        }
+
+        imageView?.setOnMouseClicked {
+            println("X: ${it.x}\tY: ${it.y}")
+        }
     }
 
     private fun showDragOverFeedback() {
