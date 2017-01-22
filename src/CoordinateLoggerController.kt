@@ -1,54 +1,73 @@
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
-import javafx.scene.control.SplitPane
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.input.DragEvent
+import javafx.scene.input.TransferMode
+import java.io.File
 import java.net.URL
 import java.util.*
-import java.io.File
-import javafx.scene.input.Dragboard
-import javafx.scene.input.TransferMode
 
 
 class CoordinateLoggerController : Initializable {
+    val supportedExtensions = arrayOf(".png", ".jpeg", ".jpg")
+    val dragHoverStyle = "-fx-border-color: #1565c0;-fx-border-width: 3;-fx-border-style: solid;-fx-background: transparent;"
 
-    @FXML
-    var scrollPane: ScrollPane? = null
+    var scrollPaneDefaultStyle: String? = null
+    var imageViewDefaultStyle: String? = null
 
-    @FXML
-    var imageView: ImageView? = null
+    @FXML var scrollPane: ScrollPane? = null
+    @FXML var imageView: ImageView? = null
+    @FXML var instructionView: Label? = null
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
+        scrollPaneDefaultStyle = scrollPane?.style
+        imageViewDefaultStyle = imageView?.style
+
+        scrollPane?.setOnDragEntered {
+            handleAcceptedFileOnDrag(it, {
+                showDragOverFeedback()
+            })
+        }
 
         scrollPane?.setOnDragOver {
-            val db = it.dragboard
-
-            val isAccepted = db.files[0].name.toLowerCase().endsWith(".png")
-                    || db.files[0].name.toLowerCase().endsWith(".jpeg")
-                    || db.files[0].name.toLowerCase().endsWith(".jpg");
-
-            if (db.hasFiles()) {
-                if (isAccepted) {
-                    imageView?.style = "-fx-border-color: red;-fx-border-width: 5;-fx-background-color: #C6C6C6;-fx-border-style: solid;"
-                    it.acceptTransferModes(TransferMode.COPY);
-                }
-            } else {
-                it.consume();
-            }
+            handleAcceptedFileOnDrag(it, {
+                it.acceptTransferModes(TransferMode.COPY)
+            })
         }
 
         scrollPane?.setOnDragDropped {
-            val db = it.dragboard
-            val isAccepted = db.files[0].name.toLowerCase().endsWith(".png")
-                    || db.files[0].name.toLowerCase().endsWith(".jpeg")
-                    || db.files[0].name.toLowerCase().endsWith(".jpg")
+            handleAcceptedFileOnDrag(it, {
+                setImage(it.dragboard.files[0].toURI().toString())
+                hideDragOverFeedback()
+                instructionView?.isVisible = false
+            })
+        }
 
-            if (db.hasFiles() && isAccepted) {
-                setImage(db.files[0].toURI().toString())
-            } else {
-                it.consume()
-            }
+        scrollPane?.setOnDragDone { hideDragOverFeedback() }
+        scrollPane?.setOnDragExited { hideDragOverFeedback() }
+    }
+
+    private fun showDragOverFeedback() {
+        scrollPane?.style = dragHoverStyle
+        imageView?.style = "-fx-opacity: 0.8;"
+    }
+
+    private fun hideDragOverFeedback() {
+        scrollPane?.style = scrollPaneDefaultStyle
+        imageView?.style = imageViewDefaultStyle
+    }
+
+    fun handleAcceptedFileOnDrag(event: DragEvent, handleFunction: (DragEvent) -> Unit) {
+        val db = event.dragboard
+        val file = db.files[0]
+
+        if (db.hasFiles() && isFileAccepted(file)) {
+            handleFunction(event)
+        } else {
+            event.consume()
         }
     }
 
@@ -60,5 +79,15 @@ class CoordinateLoggerController : Initializable {
             imageView?.image = null
             scrollPane?.opacity = 0.0
         }
+    }
+
+    fun isFileAccepted(file: File): Boolean {
+        supportedExtensions.forEach {
+            if (file.name.toLowerCase().endsWith(it)) {
+                return true
+            }
+        }
+
+        return false
     }
 }
