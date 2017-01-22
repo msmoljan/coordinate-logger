@@ -47,7 +47,7 @@ class CoordinateLoggerApplication : Application(), CoordinateLoggerController.Li
         controller.listener = this
     }
 
-    override fun onImageHoverCoordinatesReceived(x: Double, y: Double) {
+    override fun onImageHoverCoordinatesReceived(x: Int, y: Int) {
         stage?.title = "$appName ($x, $y)"
     }
 }
