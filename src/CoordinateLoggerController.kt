@@ -1,6 +1,7 @@
 import CoordinateLogger.Listener
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.scene.canvas.Canvas
 import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.TextArea
@@ -8,6 +9,10 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.DragEvent
 import javafx.scene.input.TransferMode
+import javafx.scene.layout.Pane
+import javafx.scene.paint.Color
+import javafx.scene.paint.Paint
+import javafx.scene.shape.Ellipse
 import java.io.File
 import java.net.URL
 import java.util.*
@@ -20,11 +25,11 @@ class CoordinateLoggerController : Initializable, Listener {
     }
 
     val supportedExtensions = arrayOf(".png", ".jpeg", ".jpg")
-
     val dragHoverStyle = "-fx-border-color: #1565c0;-fx-border-width: 3;-fx-border-style: solid;-fx-background: transparent;"
     val coordinateLogger = CoordinateLogger()
-    var scrollPaneDefaultStyle: String? = null
+    val dotRadius = 4.0
 
+    var scrollPaneDefaultStyle: String? = null
     var imageViewDefaultStyle: String? = null
     var listener: Listener? = null
 
@@ -32,6 +37,7 @@ class CoordinateLoggerController : Initializable, Listener {
     @FXML var imageView: ImageView? = null
     @FXML var instructionView: Label? = null
     @FXML var logView: TextArea? = null
+    @FXML var drawingPane: Pane? = null
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         setupDragAndDrop()
@@ -39,8 +45,19 @@ class CoordinateLoggerController : Initializable, Listener {
         coordinateLogger.listener = this
     }
 
+    private fun resizeDrawingPane() {
+        drawingPane?.prefWidth = imageView?.image?.width!!
+        drawingPane?.prefHeight = imageView?.image?.height!!
+    }
+
     override fun onCoordinatesUpdated() {
         logView?.text = coordinateLogger.toString()
+
+        coordinateLogger.coordinates.forEach {
+            val ellipse = Ellipse(it.x.toDouble(), it.y.toDouble(), dotRadius, dotRadius)
+            ellipse.fill = Color(1.0, 0.0, 0.0, 1.0)
+            drawingPane?.children?.add(ellipse)
+        }
     }
 
     private fun setupDragAndDrop() {
@@ -65,6 +82,8 @@ class CoordinateLoggerController : Initializable, Listener {
                 hideDragOverFeedback()
                 instructionView?.isVisible = false
                 coordinateLogger.clear()
+                resizeDrawingPane()
+                drawingPane?.children?.clear()
             })
         }
 

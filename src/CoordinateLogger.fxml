@@ -4,24 +4,23 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
-<AnchorPane id="rootPane" prefHeight="480" prefWidth="640" xmlns="http://javafx.com/javafx/8.0.102-ea"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="CoordinateLoggerController">
 
-    <Label fx:id="instructionView" alignment="CENTER" layoutX="166.0" layoutY="192.0" text="%drag_drop_image"
-           textAlignment="CENTER" wrapText="true" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
-           AnchorPane.rightAnchor="100" AnchorPane.topAnchor="0">
+<AnchorPane id="rootPane" prefHeight="480" prefWidth="640" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CoordinateLoggerController">
+
+    <Label fx:id="instructionView" alignment="CENTER" layoutX="166.0" layoutY="192.0" text="%drag_drop_image" textAlignment="CENTER" wrapText="true" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="100" AnchorPane.topAnchor="0">
         <font>
-            <Font size="16.0"/>
+            <Font size="16.0" />
         </font>
     </Label>
-    <ScrollPane fx:id="scrollPane" style="-fx-background: transparent;-fx-focus-color: transparent;"
-                styleClass="edge-to-edge" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
-                AnchorPane.rightAnchor="120" AnchorPane.topAnchor="0">
-        <ImageView fx:id="imageView" preserveRatio="true" style="-fx-background: transparent;" pickOnBounds="true"/>
+    <ScrollPane fx:id="scrollPane" style="-fx-background: transparent;-fx-focus-color: transparent;" styleClass="edge-to-edge" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="120" AnchorPane.topAnchor="0">
+        <AnchorPane>
+            <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" style="-fx-background: transparent;" />
+            <Pane fx:id="drawingPane" pickOnBounds="false" style="-fx-background: transparent;" AnchorPane.leftAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" prefHeight="400.0" prefWidth="600.0" />
+        </AnchorPane>
     </ScrollPane>
-    <TextArea fx:id="logView" editable="false" maxWidth="120.0" text="%coordinates_header" AnchorPane.bottomAnchor="0"
-              AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0"
-              style="-fx-focus-color: transparent; -fx-background: white;-fx-background-radius: 0;-fx-border-color: gray;-fx-border-style: hidden hidden hidden solid;"/>
+
+    <TextArea fx:id="logView" editable="false" maxWidth="120.0" style="-fx-focus-color: transparent; -fx-background: white;-fx-background-radius: 0;-fx-border-color: gray;-fx-border-style: hidden hidden hidden solid;" text="%coordinates_header" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
 </AnchorPane>
