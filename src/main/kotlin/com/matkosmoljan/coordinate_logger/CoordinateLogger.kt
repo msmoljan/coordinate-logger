@@ -10,17 +10,19 @@ class CoordinateLogger {
 
     var listener: Listener? = null
 
-    private val coordinates: MutableList<Coordinate> = mutableListOf()
+    private val mutableCoordinates: MutableList<Coordinate> = mutableListOf()
+    val coordinates: List<Coordinate>
+        get() = mutableCoordinates
 
     fun log(coordinate: Coordinate) {
-        coordinates.add(coordinate)
+        mutableCoordinates.add(coordinate)
         notifyListener()
     }
 
     fun clear() {
-        coordinates.clear()
+        mutableCoordinates.clear()
         notifyListener()
     }
 
-    private fun notifyListener() = listener?.onCoordinatesUpdated(coordinates)
+    private fun notifyListener() = listener?.onCoordinatesUpdated(mutableCoordinates)
 }
