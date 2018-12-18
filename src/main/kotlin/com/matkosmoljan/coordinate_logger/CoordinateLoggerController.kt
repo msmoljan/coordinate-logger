@@ -1,8 +1,10 @@
 package com.matkosmoljan.coordinate_logger
 
 import com.matkosmoljan.coordinate_logger.CoordinateLogger.Listener
+import javafx.collections.FXCollections
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.TextArea
@@ -13,9 +15,13 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Ellipse
+import javafx.scene.text.Text
 import java.io.File
 import java.net.URL
 import java.util.*
+
+private const val COORDINATE_FORMAT_ABSOLUTE = "Absolute"
+private const val COORDINATE_FORMAT_NORMALIZED = "Normalized"
 
 
 class CoordinateLoggerController : Initializable, Listener {
@@ -24,6 +30,7 @@ class CoordinateLoggerController : Initializable, Listener {
         fun onImageHoverCoordinatesReceived(x: Int, y: Int)
     }
 
+    private lateinit var numberFormatChoices: Map<Int, String>
     private val supportedExtensions = arrayOf(".png", ".jpeg", ".jpg")
     private val coordinateLogger = CoordinateLogger()
     private val dotRadius = 4.0
@@ -46,11 +53,34 @@ class CoordinateLoggerController : Initializable, Listener {
     var logView: TextArea? = null
     @FXML
     var drawingPane: Pane? = null
+    @FXML
+    var choiceBox: ChoiceBox<String>? = null
+
+    private var selectedCoordinateFormat: String = COORDINATE_FORMAT_ABSOLUTE
+        set(format) {
+            field = format
+            notifyFormatChanged(coordinateLogger.coordinates, format)
+        }
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         setupDragAndDrop()
         setupCoordinateClicks()
+        setupFormatChoiceBox()
+
         coordinateLogger.listener = this
+    }
+
+    private fun setupFormatChoiceBox() {
+        val selectionOptions = arrayOf(COORDINATE_FORMAT_ABSOLUTE, COORDINATE_FORMAT_NORMALIZED)
+
+        choiceBox?.items = FXCollections.observableArrayList(*selectionOptions)
+        choiceBox
+            ?.selectionModel
+            ?.selectedIndexProperty()
+            ?.addListener { _, _, newValue ->
+                selectedCoordinateFormat = selectionOptions[newValue.toInt()]
+            }
+        choiceBox?.selectionModel?.select(0)
     }
 
     private fun resizeDrawingPane() {
@@ -58,15 +88,61 @@ class CoordinateLoggerController : Initializable, Listener {
         drawingPane?.prefHeight = imageView?.image?.height!!
     }
 
-    override fun onCoordinatesUpdated() {
-        logView?.text = coordinateLogger.toString()
+    override fun onCoordinatesUpdated(coordinates: List<Coordinate>) {
+        updateCoordinateList(coordinates, selectedCoordinateFormat)
+    }
 
-        coordinateLogger.coordinates.forEach {
-            val ellipse = Ellipse(it.x.toDouble(), it.y.toDouble(), dotRadius, dotRadius)
-            ellipse.fill = Color(1.0, 0.0, 0.0, 1.0)
+    private fun notifyFormatChanged(coordinates: List<Coordinate>, format: String) {
+        updateCoordinateList(coordinates, format)
+    }
+
+    private fun updateCoordinateList(coordinates: List<Coordinate>, format: String) {
+        logView?.text = coordinates.listInString(format)
+
+        coordinates.forEachIndexed { index, coordinate ->
+            val x = coordinate.x.toDouble()
+            val y = coordinate.y.toDouble()
+            val ellipse = Ellipse(x, y, dotRadius, dotRadius)
+            val text = Text(x + dotRadius, y - dotRadius, "${positionFromIndex(index)}")
+            val color = Color(1.0, 0.0, 0.0, 1.0)
+
+            ellipse.fill = color
+            text.fill = color
+
             drawingPane?.children?.add(ellipse)
+            drawingPane?.children?.add(text)
         }
     }
+
+    /**
+     * @return string containing all coordinates currently stored in the logger
+     */
+    private fun CoordinateList.listInString(selectedCoordinateFormat: String): String {
+        val coordinatesBuilder = StringBuilder()
+
+        forEachIndexed { index, coordinate ->
+            val width = imageView?.boundsInParent?.width?.toFloat()
+            val height = imageView?.boundsInParent?.height?.toFloat()
+            val isAbsoluteFormat = selectedCoordinateFormat == COORDINATE_FORMAT_ABSOLUTE ||
+                    width == null ||
+                    height == null
+
+            val formattedCoordinate = if (isAbsoluteFormat) coordinate else coordinate.normalize(width!!, height!!)
+            val formattedX = (if (isAbsoluteFormat) "%.0f" else "%.4f").format(formattedCoordinate.x)
+            val formattedY = (if (isAbsoluteFormat) "%.0f" else "%.4f").format(formattedCoordinate.y)
+
+            coordinatesBuilder
+                .append(positionFromIndex(index))
+                .append(": ")
+                .append("$formattedX, ")
+                .append(formattedY)
+                .append("\n")
+        }
+
+        return coordinatesBuilder.toString()
+    }
+
+    private fun positionFromIndex(index: Int) = index + 1
 
     private fun setupDragAndDrop() {
         scrollPaneDefaultStyle = scrollPane?.style
@@ -105,7 +181,7 @@ class CoordinateLoggerController : Initializable, Listener {
         }
 
         imageView?.setOnMouseClicked {
-            coordinateLogger.log(Coordinate(it.x.toInt(), it.y.toInt()))
+            coordinateLogger.log(Coordinate(it.x.toFloat(), it.y.toFloat()))
         }
     }
 

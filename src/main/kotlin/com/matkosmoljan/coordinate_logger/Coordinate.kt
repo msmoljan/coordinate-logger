@@ -1,11 +1,12 @@
 package com.matkosmoljan.coordinate_logger
 
-data class Coordinate(val x: Int, val y: Int) {
+data class Coordinate(val x: Float, val y: Float) {
+    fun normalize(width: Float, height: Float): Coordinate {
 
-    /**
-     * @return coordinate string in form "x y"
-     */
-    override fun toString(): String {
-        return "$x $y"
+        if (width <= 0 || height <= 0) {
+            throw IllegalArgumentException("Both the width and the height have to be larger than zero")
+        }
+
+        return Coordinate(x / width, y / height)
     }
 }
