@@ -13,6 +13,7 @@ import javafx.scene.input.TransferMode
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Ellipse
+import javafx.scene.text.Text
 import java.io.File
 import java.net.URL
 import java.util.*
@@ -61,12 +62,18 @@ class CoordinateLoggerController : Initializable, Listener {
     override fun onCoordinatesUpdated(coordinates: List<Coordinate>) {
         logView?.text = coordinates.listInString()
 
-        coordinates.forEach {
-            val ellipse = Ellipse(it.x.toDouble(), it.y.toDouble(), dotRadius, dotRadius)
+        coordinates.forEachIndexed { index, coordinate ->
+            val x = coordinate.x.toDouble()
+            val y = coordinate.y.toDouble()
+            val ellipse = Ellipse(x, y, dotRadius, dotRadius)
+            val text = Text(x + dotRadius, y - dotRadius, "${index + 1}")
+            val color = Color(1.0, 0.0, 0.0, 1.0)
 
-            ellipse.fill = Color(1.0, 0.0, 0.0, 1.0)
+            ellipse.fill = color
+            text.fill = color
 
             drawingPane?.children?.add(ellipse)
+            drawingPane?.children?.add(text)
         }
     }
 
