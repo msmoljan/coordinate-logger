@@ -24,16 +24,3 @@ class CoordinateLogger {
 
     private fun notifyListener() = listener?.onCoordinatesUpdated(coordinates)
 }
-
-/**
- * @return string containing all coordinates currently stored in the logger
- */
-fun CoordinateList.listInString(): String {
-    val coordinatesBuilder = StringBuilder()
-
-    forEach {
-        coordinatesBuilder.append(it).append("\n")
-    }
-
-    return coordinatesBuilder.toString()
-}

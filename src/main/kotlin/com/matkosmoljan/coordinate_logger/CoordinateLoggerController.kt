@@ -66,7 +66,7 @@ class CoordinateLoggerController : Initializable, Listener {
             val x = coordinate.x.toDouble()
             val y = coordinate.y.toDouble()
             val ellipse = Ellipse(x, y, dotRadius, dotRadius)
-            val text = Text(x + dotRadius, y - dotRadius, "${index + 1}")
+            val text = Text(x + dotRadius, y - dotRadius, "${positionFromIndex(index)}")
             val color = Color(1.0, 0.0, 0.0, 1.0)
 
             ellipse.fill = color
@@ -76,6 +76,25 @@ class CoordinateLoggerController : Initializable, Listener {
             drawingPane?.children?.add(text)
         }
     }
+
+    /**
+     * @return string containing all coordinates currently stored in the logger
+     */
+    fun CoordinateList.listInString(): String {
+        val coordinatesBuilder = StringBuilder()
+
+        forEachIndexed { index, coordinate ->
+            coordinatesBuilder
+                .append(positionFromIndex(index))
+                .append(": ")
+                .append(coordinate)
+                .append("\n")
+        }
+
+        return coordinatesBuilder.toString()
+    }
+
+    private fun positionFromIndex(index: Int) = index + 1
 
     private fun setupDragAndDrop() {
         scrollPaneDefaultStyle = scrollPane?.style
