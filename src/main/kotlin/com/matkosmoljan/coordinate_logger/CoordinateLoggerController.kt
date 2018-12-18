@@ -58,12 +58,14 @@ class CoordinateLoggerController : Initializable, Listener {
         drawingPane?.prefHeight = imageView?.image?.height!!
     }
 
-    override fun onCoordinatesUpdated() {
-        logView?.text = coordinateLogger.toString()
+    override fun onCoordinatesUpdated(coordinates: List<Coordinate>) {
+        logView?.text = coordinates.listInString()
 
-        coordinateLogger.coordinates.forEach {
+        coordinates.forEach {
             val ellipse = Ellipse(it.x.toDouble(), it.y.toDouble(), dotRadius, dotRadius)
+
             ellipse.fill = Color(1.0, 0.0, 0.0, 1.0)
+
             drawingPane?.children?.add(ellipse)
         }
     }
@@ -105,7 +107,7 @@ class CoordinateLoggerController : Initializable, Listener {
         }
 
         imageView?.setOnMouseClicked {
-            coordinateLogger.log(Coordinate(it.x.toInt(), it.y.toInt()))
+            coordinateLogger.log(Coordinate(it.x.toFloat(), it.y.toFloat()))
         }
     }
 

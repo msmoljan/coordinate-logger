@@ -1,14 +1,16 @@
 package com.matkosmoljan.coordinate_logger
 
+typealias CoordinateList = List<Coordinate>
+
 class CoordinateLogger {
 
     interface Listener {
-        fun onCoordinatesUpdated()
+        fun onCoordinatesUpdated(coordinates: CoordinateList)
     }
 
     var listener: Listener? = null
 
-    val coordinates: MutableList<Coordinate> = mutableListOf()
+    private val coordinates: MutableList<Coordinate> = mutableListOf()
 
     fun log(coordinate: Coordinate) {
         coordinates.add(coordinate)
@@ -20,18 +22,18 @@ class CoordinateLogger {
         notifyListener()
     }
 
-    /**
-     * @return string containing all coordinates currently stored in the logger
-     */
-    override fun toString(): String {
-        val coordinatesBuilder = StringBuilder()
+    private fun notifyListener() = listener?.onCoordinatesUpdated(coordinates)
+}
 
-        coordinates.forEach {
-            coordinatesBuilder.append(it).append("\n")
-        }
+/**
+ * @return string containing all coordinates currently stored in the logger
+ */
+fun CoordinateList.listInString(): String {
+    val coordinatesBuilder = StringBuilder()
 
-        return coordinatesBuilder.toString()
+    forEach {
+        coordinatesBuilder.append(it).append("\n")
     }
 
-    private fun notifyListener() = listener?.onCoordinatesUpdated()
+    return coordinatesBuilder.toString()
 }
